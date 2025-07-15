@@ -1,0 +1,45 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Environment files
+.env
+.env.*
+
+# Tailwind CSS generated files (if any)
+*.css.map
+
+# Parcel / Vite / Webpack cache (if using)
+.cache/
+.parcel-cache/
+.next/
+out/
+
+# Production bundles
+*.tgz
+
+# Coverage
+coverage/
+
+# Others
+*.log

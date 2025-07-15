@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Links Management</title>
+    <link rel="stylesheet" href="links.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="/admin" class="nav-link">Products</a></li>
+            <li><a href="/links" class="nav-link active">Links</a></li>
+        </ul>
+    </nav>
+
+    <h1>Links Management</h1>
+    <div class="product-grid" id="links-grid"></div>
+
+    <!-- Modal for editing link -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <h2>Edit Link</h2>
+            <form id="edit-form">
+                <input type="hidden" id="link-name">
+                <label for="url">URL</label>
+                <input type="url" id="url" name="url" required placeholder="Enter URL" value="">
+                <div class="button-group">
+                    <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="save-btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <h1>Community Links Management</h1>
+    <div class="product-grid" id="community-links-grid"></div>
+
+    <!-- Modal for editing community link -->
+    <div class="modal" id="edit-community-modal">
+        <div class="modal-content">
+            <h2>Edit Community Link</h2>
+            <form id="edit-community-form">
+                <input type="hidden" id="community-link-name">
+                <label for="community-url">URL</label>
+                <input type="url" id="community-url" name="url" required placeholder="Enter URL" value="">
+                <div class="button-group">
+                    <button type="button" class="cancel-btn" onclick="closeCommunityModal()">Cancel</button>
+                    <button type="submit" class="save-btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <h1>Free Trial Links Management</h1>
+    <div class="product-grid" id="freetrial-links-grid"></div>
+
+    <!-- Modal for editing free trial link -->
+    <div class="modal" id="edit-freetrial-modal">
+        <div class="modal-content">
+            <h2>Edit Free Trial Link</h2>
+            <form id="edit-freetrial-form">
+                <input type="hidden" id="freetrial-link-name">
+                <label for="freetrial-url">URL</label>
+                <input type="url" id="freetrial-url" name="url" required placeholder="Enter URL" value="">
+                <div class="button-group">
+                    <button type="button" class="cancel-btn" onclick="closeFreeTrialModal()">Cancel</button>
+                    <button type="submit" class="save-btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Fetch links and render cards
+        async function fetchLinks() {
+            try {
+                const response = await fetch('/api/links', {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Failed to fetch links');
+                const links = await response.json();
+                renderLinks(links);
+            } catch (error) {
+                console.error('Error fetching links:', error);
+            }
+        }
+
+        // Fetch community links and render cards
+        async function fetchCommunityLinks() {
+            try {
+                const response = await fetch('/api/communitylinks', {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Failed to fetch community links');
+                const links = await response.json();
+                renderCommunityLinks(links);
+            } catch (error) {
+                console.error('Error fetching community links:', error);
+            }
+        }
+
+        // Fetch free trial links and render cards
+        async function fetchFreeTrialLinks() {
+            try {
+                const response = await fetch('/api/freetriallinks', {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Failed to fetch free trial links');
+                const links = await response.json();
+                renderFreeTrialLinks(links);
+            } catch (error) {
+                console.error('Error fetching free trial links:', error);
+            }
+        }
+
+        // Render link cards
+        function renderLinks(links) {
+            const grid = document.getElementById('links-grid');
+            grid.innerHTML = '';
+            const linkNames = ['WhatsApp', 'Telegram', 'Instagram', 'Facebook'];
+            linkNames.forEach(name => {
+                const link = links.find(l => l.name === name) || { name, url: '' };
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.dataset.linkName = name;
+                card.innerHTML = `
+                    <h3 class="product-title">${name}</h3>
+                    <p class="link-url">${link.url || 'No URL set'}</p>
+                    <button class="edit-btn" onclick="openModal('${name.replace(/'/g, "\\'")}')">Edit</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Render community link cards
+        function renderCommunityLinks(links) {
+            const grid = document.getElementById('community-links-grid');
+            grid.innerHTML = '';
+            const linkNames = ['Whatsapp', 'Facebook', 'Instagram', 'Telegram'];
+            linkNames.forEach(name => {
+                const link = links.find(l => l.name === name) || { name, url: '' };
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.dataset.linkName = name;
+                card.innerHTML = `
+                    <h3 class="product-title">${name}</h3>
+                    <p class="link-url">${link.url || 'No URL set'}</p>
+                    <button class="edit-btn" onclick="openCommunityModal('${name.replace(/'/g, "\\'")}')">Edit</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Render free trial link cards
+        function renderFreeTrialLinks(links) {
+            const grid = document.getElementById('freetrial-links-grid');
+            grid.innerHTML = '';
+            const linkNames = ['link 1', 'link 2'];
+            linkNames.forEach(name => {
+                const link = links.find(l => l.name === name) || { name, url: '' };
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.dataset.linkName = name;
+                card.innerHTML = `
+                    <h3 class="product-title">${name}</h3>
+                    <p class="link-url">${link.url || 'No URL set'}</p>
+                    <button class="edit-btn" onclick="openFreeTrialModal('${name.replace(/'/g, "\\'")}')">Edit</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Open modal and populate with link data
+        function openModal(linkName) {
+            const modal = document.getElementById('edit-modal');
+            const link = document.querySelector(`#links-grid [data-link-name="${linkName}"]`) || { url: '' };
+            document.getElementById('link-name').value = linkName;
+            document.getElementById('url').value = link.querySelector('.link-url').textContent === 'No URL set' ? '' : link.querySelector('.link-url').textContent;
+            modal.style.display = 'flex';
+        }
+
+        // Open community modal and populate with link data
+        function openCommunityModal(linkName) {
+            const modal = document.getElementById('edit-community-modal');
+            const link = document.querySelector(`#community-links-grid [data-link-name="${linkName}"]`) || { url: '' };
+            document.getElementById('community-link-name').value = linkName;
+            document.getElementById('community-url').value = link.querySelector('.link-url').textContent === 'No URL set' ? '' : link.querySelector('.link-url').textContent;
+            modal.style.display = 'flex';
+        }
+
+        // Open free trial modal and populate with link data
+        function openFreeTrialModal(linkName) {
+            const modal = document.getElementById('edit-freetrial-modal');
+            const link = document.querySelector(`#freetrial-links-grid [data-link-name="${linkName}"]`) || { url: '' };
+            document.getElementById('freetrial-link-name').value = linkName;
+            document.getElementById('freetrial-url').value = link.querySelector('.link-url').textContent === 'No URL set' ? '' : link.querySelector('.link-url').textContent;
+            modal.style.display = 'flex';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+        }
+
+        // Close community modal
+        function closeCommunityModal() {
+            document.getElementById('edit-community-modal').style.display = 'none';
+        }
+
+        // Close free trial modal
+        function closeFreeTrialModal() {
+            document.getElementById('edit-freetrial-modal').style.display = 'none';
+        }
+
+        // Handle link form submission
+        document.getElementById('edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const linkName = document.getElementById('link-name').value;
+            const url = document.getElementById('url').value;
+            try {
+                const response = await fetch(`/api/links/${encodeURIComponent(linkName)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+                if (!response.ok) throw new Error('Failed to update link');
+                const updatedLink = await response.json();
+                console.log('Updated link:', updatedLink);
+                closeModal();
+                fetchLinks(); // Refresh link grid
+            } catch (error) {
+                console.error('Error updating link:', error);
+            }
+        });
+
+        // Handle community link form submission
+        document.getElementById('edit-community-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const linkName = document.getElementById('community-link-name').value;
+            const url = document.getElementById('community-url').value;
+            try {
+                const response = await fetch(`/api/communitylinks/${encodeURIComponent(linkName)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+                if (!response.ok) throw new Error('Failed to update community link');
+                const updatedLink = await response.json();
+                console.log('Updated community link:', updatedLink);
+                closeCommunityModal();
+                fetchCommunityLinks(); // Refresh community link grid
+            } catch (error) {
+                console.error('Error updating community link:', error);
+            }
+        });
+
+        // Handle free trial link form submission
+        document.getElementById('edit-freetrial-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const linkName = document.getElementById('freetrial-link-name').value;
+            const url = document.getElementById('freetrial-url').value;
+            try {
+                const response = await fetch(`/api/freetriallinks/${encodeURIComponent(linkName)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+                if (!response.ok) throw new Error('Failed to update free trial link');
+                const updatedLink = await response.json();
+                console.log('Updated free trial link:', updatedLink);
+                closeFreeTrialModal();
+                fetchFreeTrialLinks(); // Refresh free trial link grid
+            } catch (error) {
+                console.error('Error updating free trial link:', error);
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('edit-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('edit-modal')) {
+                closeModal();
+            }
+        });
+
+        // Close community modal when clicking outside
+        document.getElementById('edit-community-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('edit-community-modal')) {
+                closeCommunityModal();
+            }
+        });
+
+        // Close free trial modal when clicking outside
+        document.getElementById('edit-freetrial-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('edit-freetrial-modal')) {
+                closeFreeTrialModal();
+            }
+        });
+
+        // Fetch all links on page load
+        window.onload = () => {
+            fetchLinks();
+            fetchCommunityLinks();
+            fetchFreeTrialLinks();
+        };
+    </script>
+</body>
+</html>

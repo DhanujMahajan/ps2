@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="/admin" class="nav-link active">Products</a></li>
+            <li><a href="/links" class="nav-link">Links</a></li>
+        </ul>
+    </nav>
+
+    <h1>Admin Product Management</h1>
+    <div class="product-grid" id="product-grid"></div>
+
+    <!-- Modal for editing product -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <h2>Edit Product</h2>
+            <form id="edit-form">
+                <input type="hidden" id="product-name">
+                <label for="is_available">Availability</label>
+                <select id="is_available" name="is_available">
+                    <option value="true">Available</option>
+                    <option value="false">Out of Stock</option>
+                </select>
+                <label for="category">Category</label>
+                <select id="category" name="category">
+                    <option value="">Select Category</option>
+                    <option value="iptv">IPTV</option>
+                    <option value="careergrowth">Career Growth</option>
+                    <option value="streaming">Streaming</option>
+                    <option value="socialmedia">Social Media</option>
+                    <option value="designing">Designing</option>
+                    <option value="otherutilities">Other Utilities</option>
+                </select>
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4" aria-label="Product description"></textarea>
+                <label>Validity Options and Prices</label>
+                <div id="validity-container" class="validity-container"></div>
+                <button type="button" class="add-validity-btn" onclick="addValidityInput()" aria-label="Add new validity option">Add Validity</button>
+                <div class="button-group">
+                    <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="save-btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Fetch products and render cards
+        async function fetchProducts() {
+            try {
+                const response = await fetch('/api/products', {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Failed to fetch products');
+                const products = await response.json();
+                renderProducts(products);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        }
+
+        // Render product cards
+        function renderProducts(products) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.dataset.productName = product.name;
+                card.innerHTML = `
+                    <img src="${product.imagepath || 'ps/placeholder.png'}" alt="${product.name}" class="product-image">
+                    <h3 class="product-title">${product.name}</h3>
+                    ${product.is_available ? '' : '<span class="stock-tag">Out of Stock</span>'}
+                    <button class="edit-btn" onclick="openModal('${product.name.replace(/'/g, "\\'")}')">Edit</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Add validity input field with price inputs
+        function addValidityInput(value = '', prices = {}) {
+            const container = document.getElementById('validity-container');
+            const validityDiv = document.createElement('div');
+            validityDiv.className = 'validity-input-group';
+            validityDiv.innerHTML = `
+                <div class="validity-row">
+                    <input type="text" class="validity-input" value="${value}" aria-label="Validity option">
+                    <button type="button" class="remove-validity-btn" onclick="this.parentElement.parentElement.remove()" aria-label="Remove validity option">Remove</button>
+                </div>
+                <div class="price-inputs">
+                    <label>USA ($)</label>
+                    <input type="number" class="price-input" data-region="usa" step="0.01" min="0" value="${prices.usa || ''}" aria-label="USA price for ${value || 'validity option'}">
+                    <label>Canada (C$)</label>
+                    <input type="number" class="price-input" data-region="canada" step="0.01" min="0" value="${prices.canada || ''}" aria-label="Canada price for ${value || 'validity option'}">
+                    <label>UK (£)</label>
+                    <input type="number" class="price-input" data-region="uk" step="0.01" min="0" value="${prices.uk || ''}" aria-label="UK price for ${value || 'validity option'}">
+                    <label>India (₹)</label>
+                    <input type="number" class="price-input" data-region="india" step="0.01" min="0" value="${prices.india || ''}" aria-label="India price for ${value || 'validity option'}">
+                    <label>NZ (NZ$)</label>
+                    <input type="number" class="price-input" data-region="nz" step="0.01" min="0" value="${prices.nz || ''}" aria-label="New Zealand price for ${value || 'validity option'}">
+                    <label>Australia (A$)</label>
+                    <input type="number" class="price-input" data-region="aus" step="0.01" min="0" value="${prices.aus || ''}" aria-label="Australia price for ${value || 'validity option'}">
+                </div>
+            `;
+            container.appendChild(validityDiv);
+        }
+
+        // Open modal and populate with product data
+        async function openModal(productName) {
+            try {
+                const response = await fetch(`/api/products/${encodeURIComponent(productName)}`, {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Failed to fetch product');
+                const product = await response.json();
+                const modal = document.getElementById('edit-modal');
+                document.getElementById('product-name').value = product.name;
+                document.getElementById('is_available').value = product.is_available ? 'true' : 'false';
+                document.getElementById('category').value = product.category || '';
+                document.getElementById('description').value = product.description || '';
+                
+                // Populate validity options and prices
+                const validityContainer = document.getElementById('validity-container');
+                validityContainer.innerHTML = '';
+                const validityOptions = product.validity ? product.validity.split('+') : [];
+                const prices = product.prices || {};
+                validityOptions.forEach(option => addValidityInput(option, prices[option] || {}));
+                if (validityOptions.length === 0) addValidityInput(); // Add one empty input if no validity
+
+                modal.style.display = 'flex';
+            } catch (error) {
+                console.error('Error fetching product:', error);
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+        }
+
+        // Handle form submission
+        document.getElementById('edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const productName = document.getElementById('product-name').value;
+            const validityGroups = document.querySelectorAll('.validity-input-group');
+            const validity = Array.from(validityGroups)
+                .map(group => group.querySelector('.validity-input').value.trim())
+                .filter(value => value !== '')
+                .join('+');
+            const prices = {};
+            validityGroups.forEach(group => {
+                const validityValue = group.querySelector('.validity-input').value.trim();
+                if (validityValue) {
+                    prices[validityValue] = {
+                        usa: group.querySelector('.price-input[data-region="usa"]').value || null,
+                        canada: group.querySelector('.price-input[data-region="canada"]').value || null,
+                        uk: group.querySelector('.price-input[data-region="uk"]').value || null,
+                        india: group.querySelector('.price-input[data-region="india"]').value || null,
+                        nz: group.querySelector('.price-input[data-region="nz"]').value || null,
+                        aus: group.querySelector('.price-input[data-region="aus"]').value || null
+                    };
+                }
+            });
+            const formData = {
+                is_available: document.getElementById('is_available').value,
+                category: document.getElementById('category').value,
+                validity: validity || null,
+                prices: Object.keys(prices).length > 0 ? prices : null,
+                description: document.getElementById('description').value.trim() || null
+            };
+
+            try {
+                const response = await fetch(`/api/products/${encodeURIComponent(productName)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                if (!response.ok) throw new Error('Failed to update product');
+                const updatedProduct = await response.json();
+                console.log('Updated product:', updatedProduct);
+                closeModal();
+                fetchProducts(); // Refresh product grid
+            } catch (error) {
+                console.error('Error updating product:', error);
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('edit-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('edit-modal')) {
+                closeModal();
+            }
+        });
+
+        // Fetch products on page load
+        window.onload = fetchProducts;
+    </script>
+</body>
+</html>

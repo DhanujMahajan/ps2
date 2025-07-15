@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - Premium Stuff4U</title>
+    <link rel="stylesheet" href="/shop.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+    <div class="header-container">
+        <!-- Add this wrapper div for the top row -->
+        <div class="header-top-row">
+            <div class="logo">
+                <div class="eagle-logo"><img class="logomain" src="/ps/logo.avif" alt="Premium Stuff4U Logo"></div>
+            </div>
+            
+            <div class="brand-title">PREMIUM STUFF4U</div>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+                <span class="hamburger-icon">☰</span>
+                <span class="close-icon" style="display: none;">×</span>
+            </button>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="SEARCH HERE" aria-label="Search products">
+        </div>
+        
+        <nav class="nav-menu" id="navMenu">
+            <button class="nav-item" data-href="/">HOME</button>
+            <div class="nav-item shop active" id="shopItem">
+                SHOP
+                <div class="dropdown">
+                    <a href="/shop" class="dropdown-item">Shop All</a>
+                    <a href="/iptv" class="dropdown-item">iPTV</a>
+                    <a href="/career-growth" class="dropdown-item">Career Growth</a>
+                    <a href="/streaming" class="dropdown-item">Streaming</a>
+                    <a href="/social-media" class="dropdown-item">Social Media</a>
+                    <a href="/designing" class="dropdown-item">Designing</a>
+                    <a href="/other-utilities" class="dropdown-item">Other Utilities</a>
+                    <a href="/refer-friends" class="dropdown-item">Refer Friends</a>
+                </div>
+            </div>
+            <button class="nav-item" data-href="/faq">FAQ</button>
+            <div class="nav-item more" id="moreItem">
+                MORE
+                <div class="dropdown">
+                    <a href="/contact-us" class="dropdown-item">Contact Us</a>
+                    <a href="/our-story" class="dropdown-item">Our Story</a>
+                </div>
+            </div>
+            <button class="nav-item" data-href="/cart">Cart</button>
+        </nav>
+    </div>
+</header>
+
+    <main class="main-content">
+        <h1 class="section-title">OUR SHOP</h1>
+        <div class="product-grid" id="product-grid"></div>
+        <!-- Modal for Add to Cart -->
+        <div id="cart-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-modal">×</span>
+                <div class="modal-product">
+                    <img class="modal-product-image" src="" alt="Product Image">
+                    <div class="modal-details">
+                        <h3 class="modal-product-title"></h3>
+                        <div class="modal-price-container">
+                            <span class="modal-product-price"></span>
+                            <select class="modal-validity-dropdown"></select>
+                        </div>
+                        <div class="modal-quantity-container">
+                            <button class="quantity-btn decrease">-</button>
+                            <span class="modal-quantity">1</span>
+                            <button class="quantity-btn increase">+</button>
+                        </div>
+                        <button class="add-to-cart-confirm">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="load-more-container">
+            <button class="load-more-btn">Load More</button>
+        </div>
+    </main>
+
+    <div class="social-icons">
+        <a href="#" class="social-icon whatsapp-icon" id="whatsapp-link" target="_blank" aria-label="WhatsApp">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Icon">
+        </a>
+        <a href="#" class="social-icon facebook-icon" id="facebook-link" target="_blank" aria-label="Facebook">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook Icon">
+        </a>
+        <a href="#" class="social-icon instagram-icon" id="instagram-link" target="_blank" aria-label="Instagram">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram Icon">
+        </a>
+        <a href="#" class="social-icon telegram-icon" id="telegram-link" target="_blank" aria-label="Telegram">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram Icon">
+        </a>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="newsletter-box">
+                <h3 class="newsletter-title">JOIN OUR NEWSLETTER</h3>
+                <input type="email" class="newsletter-input" placeholder="Enter your email here" aria-label="Newsletter email">
+                <button class="subscribe-btn">SUBSCRIBE NOW</button>
+            </div>
+            <div class="footer-divider"></div>
+            <div class="footer-links">
+                <a href="/contact-us" class="footer-link">Contact Us</a>
+                <a href="/faq" class="footer-link">Frequently Asked Questions</a>
+            </div>
+        </div>
+        <div class="copyright">© 2025 BY PREMIUM STUFF</div>
+    </footer>
+    
+    <script>
+        let sessionId = null;
+
+        // Define currency to price field mapping globally
+        const priceFieldMap = {
+            '$': 'usa',
+            'C$': 'canada',
+            '£': 'uk',
+            '₹': 'india',
+            'NZ$': 'nz',
+            'A$': 'aus'
+        };
+
+        // Fetch session ID
+        async function fetchSessionId() {
+            try {
+                const response = await fetch('/api/session-id', {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    sessionId = data.sessionId;
+                } else {
+                    console.error('Failed to fetch session ID:', await response.text());
+                    sessionId = 'default-session';
+                }
+            } catch (error) {
+                console.error('Error fetching session ID:', error);
+                sessionId = 'default-session';
+            }
+        }
+
+        // Fetch social links from database
+        async function fetchSocialLinks() {
+            try {
+                const response = await fetch('/api/links', {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Failed to fetch social links');
+                const links = await response.json();
+                updateSocialLinks(links);
+            } catch (error) {
+                console.error('Error fetching social links:', error);
+                // Fallback to default links if fetch fails
+                updateSocialLinks([
+                    { name: 'WhatsApp', url: 'https://wa.me/' },
+                    { name: 'Facebook', url: 'https://facebook.com/' },
+                    { name: 'Instagram', url: 'https://instagram.com/' },
+                    { name: 'Telegram', url: 'https://t.me/' }
+                ]);
+            }
+        }
+
+        // Update social links in the DOM
+        function updateSocialLinks(links) {
+            const linkMap = links.reduce((acc, link) => {
+                acc[link.name.toLowerCase()] = link.url || '#';
+                return acc;
+            }, {});
+
+            document.getElementById('whatsapp-link').href = linkMap['whatsapp'] || '#';
+            document.getElementById('facebook-link').href = linkMap['facebook'] || '#';
+            document.getElementById('instagram-link').href = linkMap['instagram'] || '#';
+            document.getElementById('telegram-link').href = linkMap['telegram'] || '#';
+        }
+
+        // Fetch all products
+        async function fetchProducts() {
+            try {
+                const response = await fetch('/api/products/all', {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (!response.ok) {
+                    const text = await response.text();
+                    console.error('Non-OK response:', response.status, text);
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    console.error('Non-JSON response:', text);
+                    throw new Error('Received non-JSON response');
+                }
+                const products = await response.json();
+                renderProducts(products);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                document.getElementById('product-grid').innerHTML = '<p>Error loading products. Please try again later.</p>';
+            }
+        }
+
+        // Render products
+        function renderProducts(products) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            products.forEach((product, index) => {
+                const card = document.createElement('div');
+                card.className = `product-card ${index >= 12 ? 'hidden' : ''}`;
+                card.dataset.validities = product.available_validities.join(',');
+                card.dataset.prices = JSON.stringify(product.prices || {});
+                card.dataset.currency = product.currency;
+                card.dataset.name = product.name; // Store product name for redirect
+                card.innerHTML = `
+                    <img src="${product.imagepath || '/ps/placeholder.png'}" alt="${product.name}" class="product-image">
+                    <h3 class="product-title">${product.name}</h3>
+                    <p class="product-price" aria-label="Price ${product.currency}${product.display_price}">${product.currency}${product.display_price}</p>
+                    <button class="add-to-cart-btn" ${product.is_available ? '' : 'disabled'} aria-label="Add ${product.name} to cart">
+                        ${product.is_available ? 'Add to Cart' : 'Out of Stock'}
+                    </button>
+                `;
+                // Add click event listener to the product image for redirect
+                const image = card.querySelector('.product-image');
+                image.style.cursor = 'pointer'; // Indicate clickability
+                image.addEventListener('click', () => {
+                    window.location.href = `/product/${encodeURIComponent(product.name)}`;
+                });
+                grid.appendChild(card);
+            });
+            toggleLoadMoreButton();
+            setupModalListeners();
+        }
+
+        // Toggle Load More button visibility
+        function toggleLoadMoreButton() {
+            const hiddenCards = document.querySelectorAll('.product-card.hidden');
+            const loadMoreBtn = document.querySelector('.load-more-btn');
+            if (hiddenCards.length === 0) {
+                loadMoreBtn.style.display = 'none';
+            } else {
+                loadMoreBtn.style.display = 'block';
+            }
+        }
+
+        // Setup modal listeners
+        function setupModalListeners() {
+            const modal = document.getElementById('cart-modal');
+            if (!modal) return;
+
+            // Store references to modal elements
+            const modalImage = modal.querySelector('.modal-product-image');
+            const modalTitle = modal.querySelector('.modal-product-title');
+            const modalPrice = modal.querySelector('.modal-product-price');
+            const modalValidity = modal.querySelector('.modal-validity-dropdown');
+            const modalQuantity = modal.querySelector('.modal-quantity');
+            const decreaseBtn = modal.querySelector('.decrease');
+            const increaseBtn = modal.querySelector('.increase');
+            const confirmButton = modal.querySelector('.add-to-cart-confirm');
+            const closeButton = modal.querySelector('.close-modal');
+
+            // Variables to track modal state
+            let currentQuantity = 1;
+            let currentValidityOptions = [];
+            let currentCurrency = '';
+            let currentBasePrice = 0;
+            let currentPrices = {};
+
+            // Function to update price display
+            const updatePriceDisplay = () => {
+                const selectedValidity = modalValidity.value;
+                const priceField = priceFieldMap[currentCurrency] || 'usa';
+                const basePrice = currentPrices[selectedValidity]?.[priceField] || currentBasePrice;
+                const totalPrice = basePrice * currentQuantity;
+                modalPrice.textContent = `${currentCurrency}${totalPrice.toFixed(2)}`;
+            };
+
+            // Quantity controls
+            const setupQuantityControls = () => {
+                decreaseBtn.addEventListener('click', () => {
+                    if (currentQuantity > 1) {
+                        currentQuantity--;
+                        modalQuantity.textContent = currentQuantity;
+                        updatePriceDisplay();
+                    }
+                });
+
+                increaseBtn.addEventListener('click', () => {
+                    currentQuantity++;
+                    modalQuantity.textContent = currentQuantity;
+                    updatePriceDisplay();
+                });
+            };
+
+            // Validity dropdown change handler
+            const setupValidityChangeHandler = () => {
+                modalValidity.addEventListener('change', updatePriceDisplay);
+            };
+
+            // Confirm button handler
+            const setupConfirmButton = () => {
+                confirmButton.addEventListener('click', async () => {
+                    const selectedValidity = modalValidity.value;
+                    const price = parseFloat(modalPrice.textContent.replace(currentCurrency, ''));
+
+                    try {
+                        const response = await fetch('/api/cart', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                sessionId: sessionId,
+                                productName: modalTitle.textContent,
+                                validity: selectedValidity,
+                                quantity: currentQuantity,
+                                price: price,
+                                currency: currentCurrency
+                            })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to add to cart');
+                        }
+
+                        const data = await response.json();
+                        console.log('Added to cart:', data);
+                        showSuccessModal(modalTitle.textContent, currentQuantity, price, currentCurrency, 'New item added to cart');
+                        closeModal();
+                    } catch (error) {
+                        console.error('Error adding to cart:', error);
+                        alert('Failed to add product to cart. Please try again.');
+                    }
+                });
+            };
+
+            // Close modal function
+            const closeModal = () => {
+                modal.style.display = 'none';
+                resetModalState();
+            };
+
+            // Reset modal state
+            const resetModalState = () => {
+                currentQuantity = 1;
+                modalQuantity.textContent = currentQuantity;
+                if (currentValidityOptions.length > 0) {
+                    modalValidity.value = currentValidityOptions[0];
+                }
+                updatePriceDisplay();
+            };
+
+            // Show success modal
+            function showSuccessModal(title, quantity, price, currency, message) {
+                const successModal = document.createElement('div');
+                successModal.className = 'success-modal';
+                successModal.innerHTML = `
+                    <div class="success-modal-content">
+                        <span class="success-modal-close">×</span>
+                        <p>${message.includes('updated') ? 'Quantity updated for' : 'Product'} <strong>${title}</strong> 
+                           (x${quantity} at ${currency}${price.toFixed(2)}) ${message}! 
+                           <a href="/cart">View Cart</a></p>
+                    </div>
+                `;
+                document.body.appendChild(successModal);
+
+                // Center the success modal
+                successModal.style.position = 'fixed';
+                successModal.style.top = '50%';
+                successModal.style.left = '50%';
+                successModal.style.transform = 'translate(-50%, -50%)';
+                successModal.style.background = 'rgba(0, 0, 0, 0.5)';
+                successModal.style.zIndex = '1001';
+                successModal.querySelector('.success-modal-content').style.background = '#FFFFFF';
+                successModal.querySelector('.success-modal-content').style.padding = '15px';
+                successModal.querySelector('.success-modal-content').style.borderRadius = '10px';
+                successModal.querySelector('.success-modal-content').style.textAlign = 'center';
+                successModal.querySelector('.success-modal-content').style.maxWidth = '300px';
+
+                // Close on click or after 3 seconds
+                successModal.querySelector('.success-modal-close').addEventListener('click', () => {
+                    document.body.removeChild(successModal);
+                });
+                setTimeout(() => {
+                    document.body.removeChild(successModal);
+                }, 3000);
+            }
+
+            // Set up event listeners once
+            setupQuantityControls();
+            setupValidityChangeHandler();
+            setupConfirmButton();
+            closeButton.addEventListener('click', closeModal);
+
+            // Handle outside clicks
+            window.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Set up product card click handlers for Add to Cart button
+            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    if (button.disabled) return;
+
+                    const card = button.closest('.product-card');
+                    modalImage.src = card.querySelector('.product-image').src;
+                    modalTitle.textContent = card.querySelector('.product-title').textContent;
+                    
+                    currentValidityOptions = card.dataset.validities.split(',');
+                    currentCurrency = card.dataset.currency;
+                    currentPrices = JSON.parse(card.dataset.prices);
+                    
+                    modalValidity.innerHTML = '';
+                    currentValidityOptions.forEach(val => {
+                        const option = document.createElement('option');
+                        option.value = val;
+                        option.textContent = val;
+                        modalValidity.appendChild(option);
+                    });
+
+                    const initialPriceText = card.querySelector('.product-price').textContent;
+                    currentBasePrice = parseFloat(initialPriceText.replace(currentCurrency, '')) || 
+                                    currentPrices[currentValidityOptions[0]]?.[priceFieldMap[currentCurrency] || 'usa'] || 0;
+                    
+                    resetModalState();
+                    modal.style.display = 'block';
+                });
+            });
+        }
+
+        // Navigation interactivity
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function (e) {
+                const href = this.getAttribute('data-href');
+                if (href) {
+                    window.location.href = href;
+                }
+            });
+        });
+
+        // Dropdown item click handler
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const href = this.getAttribute('href');
+                if (href && href !== '#') {
+                    window.location.href = href;
+                }
+            });
+        });
+
+        // Toggle dropdown on click for mobile support
+        document.querySelectorAll('.nav-item.shop, .nav-item.more').forEach(item => {
+            item.addEventListener('click', function (e) {
+                if (window.innerWidth <= 768) {
+                    e.stopPropagation();
+                    const dropdown = this.querySelector('.dropdown');
+                    if (dropdown) {
+                        const isVisible = dropdown.style.display === 'block';
+                        document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+                        dropdown.style.display = isVisible ? 'none' : 'block';
+                    }
+                }
+            });
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.nav-item')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+            }
+        });
+
+        // Mobile Menu Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navMenu = document.getElementById('navMenu');
+            const shopItem = document.getElementById('shopItem');
+            const moreItem = document.getElementById('moreItem');
+            const hamburgerIcon = mobileMenuBtn.querySelector('.hamburger-icon');
+            const closeIcon = mobileMenuBtn.querySelector('.close-icon');
+
+            // Function to close the mobile menu
+            function closeMenu() {
+                navMenu.classList.remove('active');
+                hamburgerIcon.style.display = 'inline';
+                closeIcon.style.display = 'none';
+                shopItem.classList.remove('active');
+                moreItem.classList.remove('active');
+            }
+
+            // Toggle mobile menu when button is clicked
+            mobileMenuBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                navMenu.classList.toggle('active');
+                
+                // Toggle between hamburger and close icons
+                if (navMenu.classList.contains('active')) {
+                    hamburgerIcon.style.display = 'none';
+                    closeIcon.style.display = 'inline';
+                } else {
+                    closeMenu();
+                }
+            });
+
+            // Toggle dropdowns for shop and more items on mobile
+            [shopItem, moreItem].forEach(function(item) {
+                item.addEventListener('click', function(e) {
+                    if (window.innerWidth <= 768) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.classList.toggle('active');
+                    }
+                });
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!navMenu.contains(e.target)) {
+                    closeMenu();
+                }
+            });
+
+            // Close menu when clicking regular nav items (not shop/more)
+            document.querySelectorAll('.nav-item:not(.shop):not(.more)').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        closeMenu();
+                    }
+                });
+            });
+
+            // Close menu when resizing above mobile breakpoint
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    closeMenu();
+                }
+            });
+        });
+
+        // Search functionality
+        document.querySelector('.search-box').addEventListener('input', async function (e) {
+            const searchTerm = e.target.value.trim();
+            
+            if (searchTerm.length === 0) {
+                // If search is empty, show all products
+                fetchProducts();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/products/search?q=${encodeURIComponent(searchTerm)}`);
+                if (!response.ok) throw new Error('Search failed');
+                const products = await response.json();
+                renderProducts(products);
+            } catch (error) {
+                console.error('Search error:', error);
+                // Fallback to client-side search if API fails
+                const allCards = document.querySelectorAll('.product-card');
+                const searchLower = searchTerm.toLowerCase();
+                
+                allCards.forEach(card => {
+                    const title = card.querySelector('.product-title').textContent.toLowerCase();
+                    card.style.display = title.includes(searchLower) ? 'block' : 'none';
+                });
+            }
+        });
+
+        // Load event listeners on DOM content loaded
+        document.addEventListener('DOMContentLoaded', async function () {
+            await fetchSessionId();
+            await fetchSocialLinks();
+            fetchProducts();
+
+            // Load more functionality
+            const loadMoreBtn = document.querySelector('.load-more-btn');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', function () {
+                    const hiddenCards = document.querySelectorAll('.product-card.hidden');
+                    hiddenCards.forEach(card => card.classList.remove('hidden'));
+                    this.style.display = 'none';
+                });
+            }
+
+            // Subscribe button handler
+            document.querySelector('.subscribe-btn').addEventListener('click', function () {
+                const email = document.querySelector('.newsletter-input').value;
+                if (email) {
+                    alert(`Subscribed with ${email}`);
+                } else {
+                    alert('Please enter a valid email address');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

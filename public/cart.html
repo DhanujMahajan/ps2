@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - PremiumStuff4U</title>
+    <link rel="stylesheet" href="cart.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <!-- Header -->
+     <header class="header">
+    <div class="header-container">
+        <!-- Add this wrapper div for the top row -->
+        <div class="header-top-row">
+            <div class="logo">
+                <div class="eagle-logo"><img class="logomain" src="ps/logo.avif" alt="Premium Stuff4U Logo"></div>
+            </div>
+            
+            <div class="brand-title">PREMIUM STUFF4U</div>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+                <span class="hamburger-icon">☰</span>
+                <span class="close-icon" style="display: none;">×</span>
+            </button>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="SEARCH HERE" aria-label="Search products">
+        </div>
+        
+        <nav class="nav-menu" id="navMenu">
+            <button class="nav-item " data-href="/">HOME</button>
+            <div class="nav-item shop " id="shopItem">
+                SHOP
+                <div class="dropdown">
+                    <a href="/shop" class="dropdown-item">Shop All</a>
+                    <a href="/iptv" class="dropdown-item">iPTV</a>
+                    <a href="/career-growth" class="dropdown-item">Career Growth</a>
+                    <a href="/streaming" class="dropdown-item">Streaming</a>
+                    <a href="/social-media" class="dropdown-item">Social Media</a>
+                    <a href="/designing" class="dropdown-item">Designing</a>
+                    <a href="/other-utilities" class="dropdown-item">Other Utilities</a>
+                    <a href="/refer-friends" class="dropdown-item">Refer Friends</a>
+                </div>
+            </div>
+            <button class="nav-item" data-href="/faq">FAQ</button>
+            <div class="nav-item more" id="moreItem">
+                MORE
+                <div class="dropdown">
+                    <a href="/contact-us" class="dropdown-item">Contact Us</a>
+                    <a href="/our-story" class="dropdown-item">Our Story</a>
+                </div>
+            </div>
+            <button class="nav-item active" data-href="/cart">Cart</button>
+        </nav>
+    </div>
+</header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="cart-container">
+            <h1 class="section-title">Your Cart</h1>
+            
+            <div class="cart-items-container">
+                <!-- Cart items will be loaded here dynamically -->
+                <div class="empty-cart-message">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Your cart is empty</p>
+                    <a href="/shop" class="continue-shopping-btn">Continue Shopping</a>
+                </div>
+            </div>
+
+            <div class="cart-summary">
+                <div class="summary-details">
+                    <h3>Order Summary</h3>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span class="subtotal-amount"></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Discount</span>
+                        <span class="discount-amount">$0.00</span>
+                    </div>
+                    <div class="summary-row total-row">
+                        <span>Total</span>
+                        <span class="total-amount"></span>
+                    </div>
+                    <button class="checkout-btn">Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="newsletter-box">
+                <h3 class="newsletter-title">Subscribe to our Newsletter</h3>
+                <input type="email" class="newsletter-input" placeholder="Your email address">
+                <button class="subscribe-btn">Subscribe</button>
+            </div>
+            <div class="footer-divider"></div>
+            <div class="footer-links">
+                <a href="/faq" class="footer-link">FAQ</a>
+                <a href="/our-story" class="footer-link">Our Story</a>
+                <a href="/refer-friends" class="footer-link">Refer Friends</a>
+                <a href="/contact-us" class="footer-link">Contact Us</a>
+            </div>
+        </div>
+        <div class="copyright">
+            © 2023 PremiumStuff4U. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal">×</span>
+            <h2>Checkout</h2>
+            <form id="checkoutForm">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div id="cartItemsModal"></div>
+                <div class="form-group total-row">
+                    <span>Total:</span>
+                    <span id="modalTotal"></span>
+                </div>
+                <button type="submit" class="checkout-confirm-btn">Checkout</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal success-modal" style="display: none;">
+        <div class="success-modal-content">
+            <span class="success-modal-close">×</span>
+            <h3>Order Placed Successfully</h3>
+            <p><strong>Order ID:</strong> <span id="orderId"></span></p>
+            <p><strong>Email:</strong> <span id="orderEmail"></span></p>
+            <p><strong>Products:</strong> <span id="orderProducts"></span></p>
+            <p><strong>Total:</strong> <span id="orderTotal"></span></p>
+            <button id="copyToClipboard" class="copy-btn">Copy to Clipboard</button>
+            <div id="socialIcons" class="social-icons"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    initializeSessionAndCart();
+
+    // Handle clicks on nav items with data-href (HOME, FAQ, Cart)
+    document.querySelectorAll('.nav-item').forEach(button => {
+        if (button.dataset.href) {
+            button.addEventListener('click', () => {
+                window.location.href = button.dataset.href;
+            });
+        }
+    });
+
+    // Handle clicks on dropdown items (Shop and More dropdowns)
+    document.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', function (e) {
+            e.stopPropagation(); // Prevent click from bubbling to parent nav-item
+            const href = this.getAttribute('href');
+            if (href && href !== '#') {
+                window.location.href = href;
+            }
+        });
+    });
+});
+
+        async function initializeSessionAndCart() {
+            try {
+                const response = await fetch('/api/session-id');
+                const data = await response.json();
+                
+                if (data.sessionId) {
+                    sessionStorage.setItem('sessionId', data.sessionId);
+                    loadCartItems();
+                } else {
+                    console.error('Failed to get session ID from server');
+                    loadCartItems();
+                }
+            } catch (error) {
+                console.error('Error initializing session:', error);
+                loadCartItems();
+            }
+        }
+
+        function loadCartItems() {
+            const sessionId = sessionStorage.getItem('sessionId');
+            
+            if (!sessionId) {
+                console.error('No session ID available');
+                document.querySelector('.empty-cart-message').style.display = 'flex';
+                updateCartSummary([]);
+                return;
+            }
+
+            fetch(`/api/cart?sessionId=${sessionId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const cartContainer = document.querySelector('.cart-items-container');
+                    const emptyMessage = document.querySelector('.empty-cart-message');
+                    
+                    const items = data.success && Array.isArray(data.items) ? data.items : [];
+                    
+                    if (items.length === 0) {
+                        emptyMessage.style.display = 'flex';
+                        updateCartSummary([]);
+                        return;
+                    }
+
+                    emptyMessage.style.display = 'none';
+                    
+                    while (cartContainer.firstChild && cartContainer.firstChild !== emptyMessage) {
+                        cartContainer.removeChild(cartContainer.firstChild);
+                    }
+
+                    items.forEach(item => {
+                        const cartItem = createCartItemElement(item);
+                        cartContainer.insertBefore(cartItem, emptyMessage);
+                    });
+
+                    updateCartSummary(items);
+                })
+                .catch(error => {
+                    console.error('Error loading cart items:', error);
+                    document.querySelector('.empty-cart-message').style.display = 'flex';
+                    updateCartSummary([]);
+                });
+        }
+
+        function createCartItemElement(item) {
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item';
+            cartItem.dataset.id = item.id;
+
+            const imagePath = item.imagepath || 'images/default-product.png';
+            
+            cartItem.innerHTML = `
+                <div class="cart-item-image">
+                    <img src="${imagePath}" alt="${item.product_name || 'Unknown Product'}">
+                </div>
+                <div class="cart-item-details">
+                    <h3 class="cart-item-title">${item.product_name || 'Unknown Product'}</h3>
+                    <div class="cart-item-quantity">
+                        <button class="quantity-btn minus" data-id="${item.id || ''}">-</button>
+                        <span class="quantity">${item.quantity || 0}</span>
+                        <button class="quantity-btn plus" data-id="${item.id || ''}">+</button>
+                    </div>
+                </div>
+                <div class="cart-item-price">
+                    <span class="price">${item.currency || '$'}${item.price ? (item.price * (item.quantity || 1)).toFixed(2) : '0.00'}</span>
+                    <button class="remove-item-btn" data-id="${item.id || ''}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+
+            const minusBtn = cartItem.querySelector('.minus');
+            const plusBtn = cartItem.querySelector('.plus');
+            const removeBtn = cartItem.querySelector('.remove-item-btn');
+
+            minusBtn.addEventListener('click', () => updateQuantity(item.id, -1));
+            plusBtn.addEventListener('click', () => updateQuantity(item.id, 1));
+            removeBtn.addEventListener('click', () => removeItem(item.id));
+
+            return cartItem;
+        }
+
+        function updateQuantity(itemId, change) {
+            const quantityElement = document.querySelector(`.cart-item[data-id="${itemId}"] .quantity`);
+            if (!quantityElement) return;
+
+            let currentQuantity = parseInt(quantityElement.textContent) || 0;
+            const newQuantity = Math.max(1, currentQuantity + change);
+
+            fetch(`/api/cart/${itemId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quantity: newQuantity })
+            })
+            .then(response => response.json())
+            .then(() => loadCartItems())
+            .catch(error => {
+                console.error('Error updating quantity:', error);
+                alert('Failed to update quantity. Please try again.');
+            });
+        }
+
+        function removeItem(itemId) {
+            if (!confirm('Are you sure you want to remove this item from your cart?')) {
+                return;
+            }
+
+            fetch(`/api/cart/${itemId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(() => loadCartItems())
+            .catch(error => {
+                console.error('Error removing item:', error);
+                alert('Failed to remove item. Please try again.');
+            });
+        }
+
+        function updateCartSummary(items = []) {
+            if (!Array.isArray(items)) {
+                items = [];
+            }
+
+            const currency = items.length > 0 ? items[0].currency : '$';
+            const subtotal = items.reduce((sum, item) => {
+                const price = parseFloat(item.price) || 0;
+                const quantity = parseInt(item.quantity) || 0;
+                return sum + (price * quantity);
+            }, 0);
+
+            const discount = 0;
+            const total = subtotal - discount;
+
+            document.querySelector('.subtotal-amount').textContent = `${currency}${subtotal.toFixed(2)}`;
+            document.querySelector('.discount-amount').textContent = `${currency}${discount.toFixed(2)}`;
+            document.querySelector('.total-amount').textContent = `${currency}${total.toFixed(2)}`;
+        }
+
+        // Checkout Modal Functionality
+        const checkoutModal = document.getElementById('checkoutModal');
+        const successModal = document.getElementById('successModal');
+        const checkoutBtn = document.querySelector('.checkout-btn');
+        const closeModal = document.querySelector('.close-modal');
+        const successCloseModal = document.querySelector('.success-modal-close');
+        const checkoutForm = document.getElementById('checkoutForm');
+        const cartItemsModal = document.getElementById('cartItemsModal');
+        const modalTotal = document.getElementById('modalTotal');
+        const copyToClipboardBtn = document.getElementById('copyToClipboard');
+        const socialIcons = document.getElementById('socialIcons');
+
+        checkoutBtn.addEventListener('click', () => {
+            const sessionId = sessionStorage.getItem('sessionId');
+            if (!sessionId) {
+                alert('Please try again. Session not found.');
+                return;
+            }
+
+            const cartItems = document.querySelectorAll('.cart-item');
+            if (cartItems.length === 0) {
+                alert('Your cart is empty. Please add items before checkout.');
+                return;
+            }
+
+            const items = Array.from(cartItems).map(item => {
+                const title = item.querySelector('.cart-item-title').textContent;
+                const quantity = item.querySelector('.quantity').textContent;
+                const priceElement = item.querySelector('.price').textContent;
+                const currency = priceElement[0];
+                const price = parseFloat(priceElement.slice(1)) / (parseInt(quantity) || 1);
+                return { title, quantity, price, currency };
+            });
+
+            cartItemsModal.innerHTML = items.map(item => `
+                <div class="modal-product">
+                    <div class="modal-details">
+                        <div class="modal-product-title">${item.title}</div>
+                        <div class="modal-price-container">
+                            <span class="modal-product-price">${item.currency}${item.price.toFixed(2)}</span>
+                            <span>Qty: ${item.quantity}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const total = document.querySelector('.total-amount').textContent;
+            modalTotal.textContent = total;
+
+            checkoutModal.style.display = 'block';
+        });
+
+        closeModal.addEventListener('click', () => {
+            checkoutModal.style.display = 'none';
+        });
+
+        checkoutForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const sessionId = sessionStorage.getItem('sessionId');
+            const total = document.querySelector('.total-amount').textContent;
+            const currency = total[0];
+            const amount = parseFloat(total.slice(1));
+
+            const cartItems = Array.from(document.querySelectorAll('.cart-item')).map(item => ({
+                product_name: item.querySelector('.cart-item-title').textContent,
+                quantity: parseInt(item.querySelector('.quantity').textContent),
+                price: parseFloat(item.querySelector('.price').textContent.slice(1)) / (parseInt(item.querySelector('.quantity').textContent) || 1),
+                currency: item.querySelector('.price').textContent[0]
+            }));
+
+            const orderData = {
+                session_id: sessionId,
+                name,
+                email,
+                phone,
+                total: amount,
+                currency,
+                items: cartItems
+            };
+
+            try {
+                const response = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    checkoutModal.style.display = 'none';
+                    document.getElementById('orderId').textContent = result.orderId;
+                    document.getElementById('orderEmail').textContent = email;
+                    document.getElementById('orderProducts').textContent = cartItems.map(item => `${item.product_name} (Qty: ${item.quantity})`).join(', ');
+                    document.getElementById('orderTotal').textContent = `${currency}${amount.toFixed(2)}`;
+
+                    // Fetch social links and use specific images
+                    const linksResponse = await fetch('/api/links');
+                    const links = await linksResponse.json();
+                    if (links && links.length > 0) {
+                        socialIcons.innerHTML = links.map(link => {
+                            let imageUrl = '';
+                            switch (link.name.toLowerCase()) {
+                                case 'whatsapp':
+                                    imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg';
+                                    break;
+                                case 'facebook':
+                                    imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg';
+                                    break;
+                                case 'instagram':
+                                    imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png';
+                                    break;
+                                case 'telegram':
+                                    imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg';
+                                    break;
+                                default:
+                                    imageUrl = 'https://via.placeholder.com/25'; // Fallback
+                            }
+                            return `
+                                <a href="${link.url}" class="social-icon" target="_blank">
+                                    <img src="${imageUrl}" alt="${link.name}" style="display: block; width: 25px; height: 25px;">
+                                </a>
+                            `;
+                        }).join('');
+                    } else {
+                        console.warn('No social links received from /api/links');
+                        socialIcons.innerHTML = '<p>No social links available.</p>';
+                    }
+
+                    // Update WhatsApp link with order details using the database URL
+                    const whatsappLink = links.find(link => link.name.toLowerCase() === 'whatsapp');
+                    if (whatsappLink) {
+                        const whatsappMessage = encodeURIComponent(`Order Details:\nOrder ID: ${result.orderId}\nEmail: ${email}\nProducts: ${cartItems.map(item => `${item.product_name} (Qty: ${item.quantity})`).join(', ')}\nTotal: ${currency}${amount.toFixed(2)}`);
+                        const baseUrl = whatsappLink.url; // e.g., https://api.whatsapp.com/send?phone=12365148799
+                        document.querySelectorAll('.social-icon').forEach((icon, index) => {
+                            if (links[index]?.name.toLowerCase() === 'whatsapp') {
+                                icon.href = `${baseUrl}&text=${whatsappMessage}`;
+                            }
+                        });
+                    }
+
+                    successModal.style.display = 'block';
+                } else {
+                    alert('Failed to place order. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error placing order:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
+
+        successCloseModal.addEventListener('click', () => {
+            successModal.style.display = 'none';
+        });
+
+        copyToClipboardBtn.addEventListener('click', () => {
+            const orderDetails = `Order ID: ${document.getElementById('orderId').textContent}\nEmail: ${document.getElementById('orderEmail').textContent}\nProducts: ${document.getElementById('orderProducts').textContent}\nTotal: ${document.getElementById('orderTotal').textContent}`;
+            navigator.clipboard.writeText(orderDetails).then(() => {
+                alert('Order details copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard.');
+            });
+        });
+
+        // Remove Item Functionality (unchanged)
+        function removeItem(itemId) {
+            if (!confirm('Are you sure you want to remove this item from your cart?')) {
+                return;
+            }
+
+            fetch(`/api/cart/${itemId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(() => loadCartItems())
+            .catch(error => {
+                console.error('Error removing item:', error);
+                alert('Failed to remove item. Please try again.');
+            });
+        }
+        document.querySelector('.search-box').addEventListener('click', function (e) {
+        e.preventDefault();
+        window.location.href = '/shop';
+    });
+    </script>
+    <script>
+// Mobile Menu Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Get DOM elements
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navMenu = document.getElementById('navMenu');
+    const shopItem = document.getElementById('shopItem');
+    const moreItem = document.getElementById('moreItem');
+    const hamburgerIcon = mobileMenuBtn.querySelector('.hamburger-icon');
+    const closeIcon = mobileMenuBtn.querySelector('.close-icon');
+
+    // Function to close the mobile menu
+    function closeMenu() {
+        navMenu.classList.remove('active');
+        hamburgerIcon.style.display = 'inline';
+        closeIcon.style.display = 'none';
+        shopItem.classList.remove('active');
+        moreItem.classList.remove('active');
+    }
+
+    // Toggle mobile menu when button is clicked
+    mobileMenuBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        navMenu.classList.toggle('active');
+        
+        // Toggle between hamburger and close icons
+        if (navMenu.classList.contains('active')) {
+            hamburgerIcon.style.display = 'none';
+            closeIcon.style.display = 'inline';
+        } else {
+            closeMenu();
+        }
+    });
+
+    // Toggle dropdowns for shop and more items on mobile
+    [shopItem, moreItem].forEach(function(item) {
+        item.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.classList.toggle('active');
+            }
+        });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!navMenu.contains(e.target)) {
+            closeMenu();
+        }
+    });
+
+    // Close menu when clicking regular nav items (not shop/more)
+    document.querySelectorAll('.nav-item:not(.shop):not(.more)').forEach(function(item) {
+        item.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                closeMenu();
+            }
+        });
+    });
+
+    // Close menu when resizing above mobile breakpoint
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            closeMenu();
+        }
+    });
+});
+</script>
+</body>
+</html>

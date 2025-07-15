@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product - PREMIUM STUFF4U</title>
+    <link rel="stylesheet" href="/product.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-top-row">
+                <div class="logo">
+                    <div class="eagle-logo"><img class="logomain" src="/ps/logo.avif" alt="Premium Stuff4U Logo"></div>
+                </div>
+                <div class="brand-title">PREMIUM STUFF4U</div>
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+                    <span class="hamburger-icon">☰</span>
+                    <span class="close-icon" style="display: none;">×</span>
+                </button>
+            </div>
+            <div class="search-container">
+                <input type="text" class="search-box" placeholder="SEARCH HERE" aria-label="Search products">
+            </div>
+            <nav class="nav-menu" id="navMenu">
+                <button class="nav-item" data-href="/">HOME</button>
+                <div class="nav-item shop active" id="shopItem">
+                    SHOP
+                    <div class="dropdown">
+                        <a href="/shop" class="dropdown-item">Shop All</a>
+                        <a href="/iptv" class="dropdown-item">iPTV</a>
+                        <a href="/career-growth" class="dropdown-item">Career Growth</a>
+                        <a href="/streaming" class="dropdown-item">Streaming</a>
+                        <a href="/social-media" class="dropdown-item">Social Media</a>
+                        <a href="/designing" class="dropdown-item">Designing</a>
+                        <a href="/other-utilities" class="dropdown-item">Other Utilities</a>
+                        <a href="/refer-friends" class="dropdown-item">Refer Friends</a>
+                    </div>
+                </div>
+                <button class="nav-item" data-href="/faq">FAQ</button>
+                <div class="nav-item more" id="moreItem">
+                    MORE
+                    <div class="dropdown">
+                        <a href="/contact-us" class="dropdown-item">Contact Us</a>
+                        <a href="/our-story" class="dropdown-item">Our Story</a>
+                    </div>
+                </div>
+                <button class="nav-item" data-href="/cart">Cart</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <h2 class="section-title">PRODUCT DETAILS</h2>
+        <div class="product-details">
+            <!-- Product details will be dynamically inserted here -->
+        </div>
+    </main>
+
+    <!-- Social Icons, Footer -->
+    <div class="social-icons">
+        <a href="#" class="social-icon whatsapp-icon" id="whatsapp-link" target="_blank" aria-label="WhatsApp">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Icon">
+        </a>
+        <a href="#" class="social-icon facebook-icon" id="facebook-link" target="_blank" aria-label="Facebook">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook Icon">
+        </a>
+        <a href="#" class="social-icon instagram-icon" id="instagram-link" target="_blank" aria-label="Instagram">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram Icon">
+        </a>
+        <a href="#" class="social-icon telegram-icon" id="telegram-link" target="_blank" aria-label="Telegram">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram Icon">
+        </a>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="newsletter-box">
+                <h3 class="newsletter-title">JOIN OUR NEWSLETTER</h3>
+                <input type="email" class="newsletter-input" placeholder="Enter your email here" aria-label="Newsletter email">
+                <button class="subscribe-btn">SUBSCRIBE NOW</button>
+            </div>
+            <div class="footer-divider"></div>
+            <div class="footer-links">
+                <a href="/contact-us" class="footer-link">Contact Us</a>
+                <a href="/faq" class="footer-link">Frequently Asked Questions</a>
+            </div>
+        </div>
+        <div class="copyright">© 2025 BY PREMIUM STUFF</div>
+    </footer>
+
+    <script>
+        let sessionId = null;
+
+        const priceFieldMap = {
+            '$': 'usa',
+            'C$': 'canada',
+            '£': 'uk',
+            '₹': 'india',
+            'NZ$': 'nz',
+            'A$': 'aus'
+        };
+
+        // Helper function to escape HTML and convert newlines to <br>
+        function escapeHtmlAndAddBreaks(text) {
+            if (!text) return '';
+            // Escape HTML characters to prevent XSS
+            const div = document.createElement('div');
+            div.textContent = text;
+            const escaped = div.innerHTML;
+            // Replace newlines with <br>
+            return escaped.replace(/\n/g, '<br>');
+        }
+
+        async function fetchSessionId() {
+            try {
+                const response = await fetch('/api/session-id', {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    sessionId = data.sessionId;
+                } else {
+                    console.error('Failed to fetch session ID:', await response.text());
+                    sessionId = 'default-session';
+                }
+            } catch (error) {
+                console.error('Error fetching session ID:', error);
+                sessionId = 'default-session';
+            }
+        }
+
+        async function fetchSocialLinks() {
+            try {
+                const response = await fetch('/api/links', {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Failed to fetch social links');
+                const links = await response.json();
+                updateSocialLinks(links);
+            } catch (error) {
+                console.error('Error fetching social links:', error);
+                updateSocialLinks([
+                    { name: 'WhatsApp', url: 'https://wa.me/' },
+                    { name: 'Facebook', url: 'https://facebook.com/' },
+                    { name: 'Instagram', url: 'https://instagram.com/' },
+                    { name: 'Telegram', url: 'https://t.me/' }
+                ]);
+            }
+        }
+
+        function updateSocialLinks(links) {
+            const linkMap = links.reduce((acc, link) => {
+                acc[link.name.toLowerCase()] = link.url || '#';
+                return acc;
+            }, {});
+            document.getElementById('whatsapp-link').href = linkMap['whatsapp'] || '#';
+            document.getElementById('facebook-link').href = linkMap['facebook'] || '#';
+            document.getElementById('instagram-link').href = linkMap['instagram'] || '#';
+            document.getElementById('telegram-link').href = linkMap['telegram'] || '#';
+        }
+
+        function showSuccessModal(title, quantity, price, currency, message) {
+            const successModal = document.createElement('div');
+            successModal.className = 'success-modal';
+            successModal.innerHTML = `
+                <div class="success-modal-content">
+                    <span class="success-modal-close">×</span>
+                    <p>${message.includes('updated') ? 'Quantity updated for' : 'Product'} <strong>${title}</strong> 
+                       (x${quantity} at ${currency}${Number(price).toFixed(2)}) ${message}! 
+                       <a href="/cart">View Cart</a></p>
+                </div>
+            `;
+            document.body.appendChild(successModal);
+
+            successModal.style.position = 'fixed';
+            successModal.style.top = '50%';
+            successModal.style.left = '50%';
+            successModal.style.transform = 'translate(-50%, -50%)';
+            successModal.style.background = 'rgba(0, 0, 0, 0.5)';
+            successModal.style.zIndex = '1001';
+            successModal.querySelector('.success-modal-content').style.background = '#FFFFFF';
+            successModal.querySelector('.success-modal-content').style.padding = '15px';
+            successModal.querySelector('.success-modal-content').style.borderRadius = '10px';
+            successModal.querySelector('.success-modal-content').style.textAlign = 'center';
+            successModal.querySelector('.success-modal-content').style.maxWidth = '300px';
+
+            successModal.querySelector('.success-modal-close').addEventListener('click', () => {
+                document.body.removeChild(successModal);
+            });
+            setTimeout(() => {
+                document.body.removeChild(successModal);
+            }, 3000);
+        }
+
+        async function fetchAndRenderProduct() {
+            const productContainer = document.querySelector('.product-details');
+            let currentProduct = null;
+            let quantity = 1;
+
+            // Get product name from URL
+            const productName = decodeURIComponent(window.location.pathname.split('/').pop());
+
+            // Fetch product details
+            try {
+                const response = await fetch(`/api/product/${productName}`);
+                if (!response.ok) throw new Error('Product not found');
+                currentProduct = await response.json();
+
+                // Render product details with description below Add to Cart
+                productContainer.innerHTML = `
+                    <div class="product-card">
+                        <img src="/${currentProduct.imagepath.replace(/^\//, '')}" alt="${currentProduct.name}" class="product-image">
+                        <h3 class="product-title">${currentProduct.name}</h3>
+                        <div class="price-container">
+                            <span class="product-price">${currentProduct.currency}${Number(currentProduct.display_price).toFixed(2)}</span>
+                        </div>
+                        <div class="validity-container">
+                            <h4 class="validity-title">Validity</h4>
+                            <select class="validity-dropdown">
+                                ${currentProduct.available_validities.map(validity => 
+                                    `<option value="${validity}">${validity}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+                        <div class="quantity-container">
+                            <button class="quantity-btn" data-action="decrease">-</button>
+                            <span class="quantity">1</span>
+                            <button class="quantity-btn" data-action="increase">+</button>
+                        </div>
+                        <button class="add-to-cart-btn">Add to Cart</button>
+                        ${currentProduct.description ? `<p class="product-description">${escapeHtmlAndAddBreaks(currentProduct.description)}</p>` : ''}
+                    </div>
+                `;
+
+                // Update price when validity changes
+                const validityDropdown = document.querySelector('.validity-dropdown');
+                const priceElement = document.querySelector('.product-price');
+                const quantityElement = document.querySelector('.quantity');
+                validityDropdown.addEventListener('change', () => {
+                    const selectedValidity = validityDropdown.value;
+                    const price = currentProduct.prices[selectedValidity]?.[priceFieldMap[currentProduct.currency]] || currentProduct.display_price;
+                    priceElement.textContent = `${currentProduct.currency}${Number(price).toFixed(2)}`;
+                });
+
+                // Quantity controls
+                document.querySelectorAll('.quantity-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const action = btn.getAttribute('data-action');
+                        if (action === 'increase') quantity++;
+                        if (action === 'decrease' && quantity > 1) quantity--;
+                        quantityElement.textContent = quantity;
+                    });
+                });
+
+                // Add to cart button
+                document.querySelector('.add-to-cart-btn').addEventListener('click', async () => {
+                    const selectedValidity = validityDropdown.value;
+                    const price = currentProduct.prices[selectedValidity]?.[priceFieldMap[currentProduct.currency]] || currentProduct.display_price;
+
+                    try {
+                        const response = await fetch('/api/cart', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                sessionId,
+                                productName: currentProduct.name,
+                                validity: selectedValidity,
+                                quantity,
+                                price: Number(price),
+                                currency: currentProduct.currency
+                            })
+                        });
+                        if (response.ok) {
+                            showSuccessModal(
+                                currentProduct.name,
+                                quantity,
+                                price,
+                                currentProduct.currency,
+                                'added to cart'
+                            );
+                        } else {
+                            alert('Failed to add to cart.');
+                        }
+                    } catch (error) {
+                        console.error('Error adding to cart:', error);
+                        alert('Error adding to cart.');
+                    }
+                });
+            } catch (error) {
+                productContainer.innerHTML = '<p>Product not found.</p>';
+                console.error('Error fetching product:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchSessionId();
+            await fetchSocialLinks();
+            await fetchAndRenderProduct();
+
+            // Handle navigation clicks
+            document.querySelectorAll('.nav-item[data-href]').forEach(item => {
+                item.addEventListener('click', () => {
+                    window.location.href = item.getAttribute('data-href');
+                });
+            });
+
+            // Mobile menu toggle
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navMenu = document.getElementById('navMenu');
+            const hamburgerIcon = mobileMenuBtn.querySelector('.hamburger-icon');
+            const closeIcon = mobileMenuBtn.querySelector('.close-icon');
+            mobileMenuBtn.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                hamburgerIcon.style.display = navMenu.classList.contains('active') ? 'none' : 'inline';
+                closeIcon.style.display = navMenu.classList.contains('active') ? 'inline' : 'none';
+            });
+
+            // Dropdown toggle for mobile
+            document.querySelectorAll('.nav-item.shop, .nav-item.more').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    if (window.innerWidth <= 576) {
+                        e.stopPropagation();
+                        item.classList.toggle('active');
+                    }
+                });
+            });
+
+            document.querySelector('.subscribe-btn').addEventListener('click', () => {
+                const email = document.querySelector('.newsletter-input').value;
+                if (email) {
+                    alert(`Subscribed with ${email}`);
+                } else {
+                    alert('Please enter a valid email address');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
