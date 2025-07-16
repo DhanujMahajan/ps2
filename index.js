@@ -18,27 +18,33 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: { 
-        secure: false, // Set to true in production with HTTPS
-        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        secure: false,
+        maxAge: 30 * 24 * 60 * 60 * 1000
     }
 }));
 
-// PostgreSQL configuration for Railway
+// PostgreSQL configuration for Railway with search path
 const pool = new Pool({
-    connectionString: 'postgresql://postgres:lNRGchvdLlCbhJfuXCDOSROiSsKhFtmE@yamanote.proxy.rlwy.net:57593/railway',
-    ssl: {
-        rejectUnauthorized: false // Required for Railway's hosted PostgreSQL
-    }
+    connectionString: 'postgresql://postgres:lNRGchvdLlCbhJfuXCDOSROiSsKhFtmE@yamanote.proxy.rlwy.net:57593/ps',
+    ssl: { rejectUnauthorized: false },
+    statement_timeout: 30000, // 30 seconds timeout to catch connection issues
+    query_timeout: 30000,
+    // Set search path to ensure public schema is used
+    application_name: 'ps2',
 });
 
-// Test database connection
+// Test database connection and log schema
 pool.connect((err, client, release) => {
     if (err) {
         console.error('Error acquiring client from Railway DB', err.stack);
         return;
     }
     console.log('Connected to Railway PostgreSQL database');
-    release();
+    client.query('SHOW search_path', (err, res) => {
+        if (err) console.error('Error fetching search path:', err.stack);
+        else console.log('Current search path:', res.rows[0].search_path);
+        release();
+    });
 });
 
 // Middleware to check if user is authenticated
