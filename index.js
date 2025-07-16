@@ -61,7 +61,19 @@ async function getUserCountry(req) {
         if (req.session.country) {
             return req.session.country;
         }
-        const response = await axios.get('https://ipapi.co/json/', {
+
+        // Extract client IP from X-Forwarded-For header or fallback to connection remote address
+        let clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        if (Array.isArray(clientIp)) {
+            clientIp = clientIp[0]; // Take the first IP if multiple are present
+        }
+        // Remove port if included (e.g., "192.168.1.1:port" -> "192.168.1.1")
+        clientIp = clientIp.split(':')[0];
+
+        console.log('Detected client IP:', clientIp);
+
+        // Use IP-specific endpoint to get geolocation
+        const response = await axios.get(`https://ipapi.co/${clientIp}/json/`, {
             headers: { 'User-Agent': 'PremiumStuff4U/1.0' }
         });
         const country = response.data.country_name;
@@ -69,7 +81,7 @@ async function getUserCountry(req) {
         return country;
     } catch (err) {
         console.error('Error fetching geolocation:', err.message);
-        return 'United States'; // Default country
+        return 'United States'; // Default country as fallback
     }
 }
 
