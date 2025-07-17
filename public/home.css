@@ -950,14 +950,14 @@ body {
     }
 
     .product-icon {
-        width: 100px;
-        height: 100px;
+        width: 120px;
+        height: 120px;
         margin: 10px auto;
     }
 
     .product-icon img {
-        width: 100px;
-        height: 100px;
+        width: 120px;
+        height: 120px;
     }
 
     .product-title {
@@ -2113,20 +2113,7 @@ body {
         gap: 8px;
     }
     
-    .product-card {
-        min-height: 180px;
-        padding: 12px;
-    }
     
-    .product-icon {
-        width: 90px;
-        height: 90px;
-    }
-    
-    .product-icon img {
-        width: 100%;
-        height: 100%;
-    }
     
     .product-title {
         font-size: 13px;
