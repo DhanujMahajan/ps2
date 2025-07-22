@@ -357,6 +357,17 @@ app.get('/cart', (req, res) => {
 app.get('/product/:productName', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'product.html'));
 });
+app.get('/logout', (req, res) => {
+        req.session.destroy(err => {
+        if (err) {
+            console.error('Logout error:', err);
+            return res.status(500).json({ success: false, message: 'Logout failed' });
+        }
+
+        res.clearCookie('connect.sid'); // clear session cookie
+        res.json({ success: true, message: 'Logged out successfully' });
+    });
+});
 
 // Clear session for testing
 app.get('/clear-session', (req, res) => {
