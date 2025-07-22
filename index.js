@@ -365,8 +365,7 @@ app.get('/logout', (req, res) => {
         }
 
         res.clearCookie('connect.sid'); // clear session cookie
-      res.sendFile(path.join(__dirname, 'public', 'authenticate.html'));
-
+        res.redirect('/authenticate');
     });
 });
 
