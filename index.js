@@ -365,7 +365,8 @@ app.get('/logout', (req, res) => {
         }
 
         res.clearCookie('connect.sid'); // clear session cookie
-        res.json({ success: true, message: 'Logged out successfully' });
+      res.sendFile(path.join(__dirname, 'public', 'authenticate.html'));
+
     });
 });
 
